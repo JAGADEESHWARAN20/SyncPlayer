@@ -1,0 +1,225 @@
+import React, { useState, useRef, useEffect } from "react";
+import "./style.css";
+
+export default function App() {
+  // --- State Management ---
+  const [videoPreview, setVideoPreview] = useState(null);
+  const [inputVisible, setInputVisible] = useState(true);
+  const [volumeLevel, setVolumeLevel] = useState(0.5);
+  const [fade, setFade] = useState(false);
+  const [activeTab, setActiveTab] = useState("video");
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [mouseTopRegion, setMouseTopRegion] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [showVolume, setShowVolume] = useState(false);
+  const [showVolumeIcon, setShowVolumeIcon] = useState(false);
+  const [showPlayPauseIcon, setShowPlayPauseIcon] = useState(false);
+
+  const videoRef = useRef(null);
+  let fadeTimeout = null;
+
+  // --- Event Handlers ---
+  const handleKeyDown = (event) => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    switch (event.key) {
+      case "ArrowRight":
+        video.currentTime = Math.min(video.duration, video.currentTime + 5);
+        break;
+      case "ArrowLeft":
+        video.currentTime = Math.max(0, video.currentTime - 5);
+        break;
+      case "ArrowUp":
+        video.volume = Math.min(1, video.volume + 0.1);
+        setVolumeLevel(video.volume);
+        triggerFade();
+        break;
+      case "ArrowDown":
+        video.volume = Math.max(0, video.volume - 0.1);
+        setVolumeLevel(video.volume);
+        triggerFade();
+        break;
+      case "f":
+        video.requestFullscreen?.();
+        break;
+      case "Escape":
+        document.exitFullscreen?.();
+        break;
+      case " ":
+        togglePlayPause();
+        break;
+      default:
+        break;
+    }
+  };
+
+   // Track mouse position and update visibility of controls/icons
+   const handleMouseMove = (event) => {
+    const mouseX = event.clientX;  // Mouse's horizontal position
+    const mouseY = event.clientY;  // Mouse's vertical position
+    const screenWidth = window.innerWidth; // Screen width
+
+    // Define the top center region (e.g., top 50px and horizontally centered)
+    const topRegionHeight = 50;
+    const topRegionWidth = 300;  // You can adjust the width (horizontal region)
+    const topRegionStartX = (screenWidth - topRegionWidth) / 2; // Left side of the region
+    const topRegionEndX = topRegionStartX + topRegionWidth; // Right side of the region
+
+    // Check if the mouse is within the top center region
+    if (mouseY < topRegionHeight && mouseX >= topRegionStartX && mouseX <= topRegionEndX) {
+      setMouseTopRegion(true);
+    } else {
+      setMouseTopRegion(false);
+    }
+  };
+
+  // Set up event listener for mouse move
+  useEffect(() => {
+    document.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+
+
+  const handleVideoChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const previewURL = URL.createObjectURL(file);
+      setVideoPreview(previewURL);
+      setInputVisible(false);
+    }
+  };
+
+  const togglePlayPause = () => {
+    const video = videoRef.current;
+    if (video.paused) {
+      video.play();
+      setIsPlaying(true);
+      getPlayPauseIcon()
+    } else {
+      video.pause();
+      setIsPlaying(false);
+      getPlayPauseIcon()
+    }
+  };
+
+  const triggerFade = () => {
+    setFade(false);
+    clearTimeout(fadeTimeout);
+    fadeTimeout = setTimeout(() => setFade(true), 500);
+  };
+
+  // --- Icon Rendering ---
+  const getVolumeIcon = () => {
+    if (volumeLevel === 0 || isMuted) {
+      return <box-icon name="volume-mute" type="solid" color="#ffffff"></box-icon>;
+    } else if (volumeLevel < 0.5) {
+      return <box-icon name="volume-low" type="solid" color="#ffffff"></box-icon>;
+    } else {
+      return <box-icon name="volume-full" type="solid" color="#ffffff"></box-icon>;
+    }
+  };
+
+  const getPlayPauseIcon = () => {
+    return isPlaying ? (
+      <box-icon name='pause' color='#ffffff' ></box-icon>
+    ) : (
+      <box-icon name="play"  color="#ffffff" ></box-icon>
+    );
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  // --- JSX Rendering ---
+  return (
+    <div
+      className="w-[100dvw] h-[100dvh] flex flex-col justify-center items-center bg-slate-700 text-white"
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      style={{ outline: "none" }}
+    >
+      {/* --- Tab Buttons --- */}
+      <div
+        className={`flex items-center justify-center flex-row gap-2 w-1/2 absolute transition-all duration-300 ${mouseTopRegion ? 'top-[20px]' : 'top-[-200px]'}`}
+      >
+        {['video', 'audio', 'sync'].map((tab) => (
+          <button
+            key={tab}
+            className={`${activeTab === tab ? 'bg-white' : 'border border-white'} bg-red-200 z-[999] text-black hover:bg-red-300 px-3 py-1`}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {/* --- Active Tab Content --- */}
+      {activeTab === "video" && (
+        <div className="relative w-full h-full">
+          {inputVisible && (
+            <div className="border border-white w-[20%] h-[20%] top-[40%] cursor-pointer opacity-100 flex items-center justify-center absolute left-[40%]">
+              <box-icon name="video-plus" className="scale-[280%]" type="solid" animation="tada" color="#ffffff"></box-icon>
+              <input
+                type="file"
+                accept="video/*"
+                className="w-full h-full absolute z-[9] bg-red-200 cursor-pointer opacity-0"
+                onChange={handleVideoChange}
+              />
+            </div>
+          )}
+          {videoPreview && (
+            <>
+              <video
+                ref={videoRef}
+                src={videoPreview}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
+              />
+              {/* Volume Icon */}
+              {showVolume && showVolumeIcon && (
+                <div
+                  className={`absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 text-2xl z-[999] font-bold bg-black  px-4 py-2 rounded ${fade ? "opacity-0" : "opacity-100"} transition-opacity duration-500`}
+                >
+                  {getVolumeIcon()} {(volumeLevel * 100).toFixed(0)}%
+                </div>
+              )}
+
+              {/* Play/Pause Icon */}
+              {isPlaying && (
+                <div
+                  className={`absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 z-[999] text-2xl font-bold bg-black  px-4 py-2 rounded ${fade ? "opacity-0" : "opacity-100"} transition-opacity duration-500`}
+                >
+                  {getPlayPauseIcon()}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      {activeTab === "audio" && (
+        <div className="text-white text-2xl">Audio Controls or Content</div>
+      )}
+
+      {activeTab === "sync" && (
+        <div className="text-white text-2xl">Sync Controls or Content</div>
+      )}
+    </div>
+  );
+}

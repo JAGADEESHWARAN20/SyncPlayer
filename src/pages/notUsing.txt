@@ -1,0 +1,587 @@
+// import '../output.css';
+// import 'boxicons/css/boxicons.min.css';
+
+
+// document.addEventListener('DOMContentLoaded', () => {
+//      const root = document.getElementById('root');
+//      if (root) {
+//           const container = document.createElement('div');
+//           container.className =
+//                'flex justify-center items-center h-[100dvh] w-[100dvw] gap-20'; // Full screen container
+
+//           // Create two square divs
+//           for (let i = 0; i < 1; i++) {
+//                const squareDiv = document.createElement('div');
+//                squareDiv.className =
+//                     'flex flex-row items-center  rounded-md  w-auto h-auto gap-10 ';
+
+//                // Create audio input wrapper
+//                const audioWrapper = document.createElement('div');
+//                audioWrapper.className = 'flex flex-col border border-slate-400 rounded-xl p-[50px]  items-center gap-2';
+
+//                // Audio icon
+//                const audioIcon = document.createElement('i');
+//                audioIcon.className = 'bx bxs-music text-4xl text-black'; // Boxicons class
+//                audioWrapper.appendChild(audioIcon);
+
+//                // Audio label
+//                const audioLabel = document.createElement('label');
+//                audioLabel.textContent = 'Import Audio';
+//                audioLabel.className = 'text-black text-md cursor-pointer text-nowrap font-semibold';
+//                audioWrapper.appendChild(audioLabel);
+
+//                // Audio input
+//                const audioInput = document.createElement('input');
+//                audioInput.type = 'file';
+//                audioInput.accept = 'audio/*';
+//                audioInput.className = 'hidden'; // Hide the default input
+//                audioWrapper.appendChild(audioInput);
+
+//                // Make the label clickable for the input
+//                audioLabel.addEventListener('click', () => audioInput.click());
+
+//                // Create video input wrapper
+//                const videoWrapper = document.createElement('div');
+//                videoWrapper.className = 'flex flex-col border border-slate-400 rounded-xl p-[50px] items-center gap-2';
+
+//                // Video icon
+//                const videoIcon = document.createElement('i');
+//                videoIcon.className = 'bx bxs-video text-4xl text-black'; // Boxicons class
+//                videoWrapper.appendChild(videoIcon);
+
+//                // Video label
+//                const videoLabel = document.createElement('label');
+//                videoLabel.textContent = 'Import Video';
+//                videoLabel.className = 'text-black text-md text-nowrap font-semibold';
+//                videoWrapper.appendChild(videoLabel);
+
+//                // Video input
+//                const videoInput = document.createElement('input');
+//                videoInput.type = 'file';
+//                videoInput.accept = 'video/*';
+//                videoInput.className = 'hidden'; // Hide the default input
+//                videoWrapper.appendChild(videoInput);
+
+//                // Make the label clickable for the input
+//                videoLabel.addEventListener('click', () => videoInput.click());
+
+//                // Append wrappers to the square div
+//                squareDiv.appendChild(audioWrapper);
+//                squareDiv.appendChild(videoWrapper);
+
+//                // Append square div to the container
+//                container.appendChild(squareDiv);
+//           }
+
+//           // Append the container to the root element
+//           root.appendChild(container);
+//      } else {
+//           console.error('Element with id "root" not found.');
+//      }
+// });
+
+// import '../output.css';
+// import 'boxicons/css/boxicons.min.css';
+
+// document.addEventListener('DOMContentLoaded', () => {
+//      const root = document.getElementById('root');
+//      if (root) {
+//           const container = document.createElement('div');
+//           container.className =
+//                'flex justify-center items-center h-[100dvh] w-[100dvw] gap-20'; // Full screen container
+
+//           // Create two square divs
+//           for (let i = 0; i < 1; i++) {
+//                const squareDiv = document.createElement('div');
+//                squareDiv.className =
+//                     'flex flex-row items-center rounded-md w-auto h-auto gap-10';
+
+//                // Create audio input wrapper
+//                const audioWrapper = document.createElement('div');
+//                audioWrapper.className = 'flex flex-col border border-slate-400 rounded-xl p-[50px] items-center gap-2';
+
+//                // Audio icon
+//                const audioIcon = document.createElement('i');
+//                audioIcon.className = 'bx bxs-music text-4xl text-black'; // Boxicons class
+//                audioWrapper.appendChild(audioIcon);
+
+//                // Audio label
+//                const audioLabel = document.createElement('label');
+//                audioLabel.textContent = 'Import Audio';
+//                audioLabel.className = 'text-black text-md cursor-pointer text-nowrap font-semibold';
+//                audioWrapper.appendChild(audioLabel);
+
+//                // Audio input
+//                const audioInput = document.createElement('input');
+//                audioInput.type = 'file';
+//                audioInput.accept = 'audio/*';
+//                audioInput.className = 'hidden'; // Hide the default input
+//                audioWrapper.appendChild(audioInput);
+
+//                // Make the label clickable for the input
+//                audioLabel.addEventListener('click', () => audioInput.click());
+
+//                // Create video input wrapper
+//                const videoWrapper = document.createElement('div');
+//                videoWrapper.className = 'flex flex-col border border-slate-400 rounded-xl p-[50px] items-center gap-2';
+
+//                // Video icon
+//                const videoIcon = document.createElement('i');
+//                videoIcon.className = 'bx bxs-video text-4xl text-black'; // Boxicons class
+//                videoWrapper.appendChild(videoIcon);
+
+//                // Video label
+//                const videoLabel = document.createElement('label');
+//                videoLabel.textContent = 'Import Video';
+//                videoLabel.className = 'text-black text-md text-nowrap font-semibold';
+//                videoWrapper.appendChild(videoLabel);
+
+//                // Video input
+//                const videoInput = document.createElement('input');
+//                videoInput.type = 'file';
+//                videoInput.accept = 'video/*';
+//                videoInput.className = 'hidden'; // Hide the default input
+//                videoWrapper.appendChild(videoInput);
+
+//                // Make the label clickable for the input
+//                videoLabel.addEventListener('click', () => videoInput.click());
+
+//                // Create loading bar container (hidden initially)
+//                const loadingBarContainer = document.createElement('div');
+//                loadingBarContainer.className = 'fixed inset-0 flex justify-center items-center hidden'; // Centered container
+//                const loadingBar = document.createElement('div');
+//                loadingBar.className = 'bg-black h-[2dvh] rounded-full w-0'; // Initial width 0% and black color
+//                loadingBarContainer.appendChild(loadingBar);
+
+//                // Append wrappers to the square div
+//                squareDiv.appendChild(audioWrapper);
+//                squareDiv.appendChild(videoWrapper);
+//                squareDiv.appendChild(loadingBarContainer); // Add the loading bar container
+
+//                // Append square div to the container
+//                container.appendChild(squareDiv);
+
+//                // Listen for file selection
+//                let isAudioSelected = false;
+//                let isVideoSelected = false;
+
+//                audioInput.addEventListener('change', () => {
+//                     if (audioInput.files.length > 0) {
+//                          isAudioSelected = true;
+//                          checkIfBothSelected();
+//                     }
+//                });
+
+//                videoInput.addEventListener('change', () => {
+//                     if (videoInput.files.length > 0) {
+//                          isVideoSelected = true;
+//                          checkIfBothSelected();
+//                     }
+//                });
+
+//                // Check if both audio and video are selected
+//                function checkIfBothSelected() {
+//                     if (isAudioSelected && isVideoSelected) {
+//                          startLoading();
+//                          hideInputDivs();
+//                     } else {
+//                          stopLoading();
+//                     }
+//                }
+
+//                // Hide audio and video input divs
+//                function hideInputDivs() {
+//                     audioWrapper.classList.add('hidden');
+//                     videoWrapper.classList.add('hidden');
+//                }
+
+//                // Simulate loading animation (width from left to right)
+//                function startLoading() {
+//                     const loadingBarContainer = squareDiv.querySelector('.fixed');
+//                     loadingBarContainer.classList.remove('hidden'); // Show loading bar container
+//                     const loadingBar = loadingBarContainer.querySelector('.w-0') as HTMLDivElement; // Cast to HTMLDivElement
+
+//                     let width = 0;
+//                     const interval = setInterval(() => {
+//                          if (width >= 60) { // Stop at 60%
+//                               clearInterval(interval);
+//                          } else {
+//                               width++;
+//                               loadingBar.style.width = `${width}%`;
+//                          }
+//                     }, 20); // Adjust interval to control animation speed
+//                }
+
+//                function stopLoading() {
+//                     const loadingBarContainer = squareDiv.querySelector('.fixed');
+//                     loadingBarContainer.classList.add('hidden'); // Hide loading bar container
+//                }
+//           }
+
+//           // Append the container to the root element
+//           root.appendChild(container);
+//      } else {
+//           console.error('Element with id "root" not found.');
+//      }
+// });
+
+
+
+import '../output.css';
+import 'boxicons/css/boxicons.min.css';
+
+document.addEventListener('DOMContentLoaded', () => {
+     const root = document.getElementById('root');
+
+     if (root) {
+          const audioElement: HTMLAudioElement = document.createElement('audio');
+          const videoElement: HTMLVideoElement = document.createElement('video');
+
+          const container = document.createElement('div');
+          container.className = 'flex flex-col justify-center items-center h-screen w-full bg-gray-900 text-white';
+
+          // Title
+          const title = document.createElement('h1');
+          title.className = 'text-3xl font-semibold mb-8 tracking-wide';
+          title.textContent = 'Upload Audio and Video Files';
+          container.appendChild(title);
+
+          // Input container with audio and video input
+          const inputContainer = document.createElement('div');
+          inputContainer.className = 'flex gap-6 items-center justify-center flex-wrap mb-8';
+
+          // Audio input
+          const audioInputWrapper = createFileInputWrapper('audio/*', 'bx-music', 'audio');
+          // Video input
+          const videoInputWrapper = createFileInputWrapper('video/*', 'bx-video', 'video');
+
+          inputContainer.appendChild(audioInputWrapper);
+          inputContainer.appendChild(videoInputWrapper);
+          container.appendChild(inputContainer);
+
+          // Progress loader and black canvas overlay
+          const blackCanvas = document.createElement('div');
+          blackCanvas.className = 'fixed inset-0 bg-black opacity-100 hidden flex justify-center items-center';
+
+          const loaderWrapper = document.createElement('div');
+          loaderWrapper.className = 'flex flex-col items-center text-center space-y-4';
+
+          const progressLoaderContainer = document.createElement('div');
+          progressLoaderContainer.className = 'w-3/4 max-w-[400px] h-1 bg-gray-700 rounded-full relative mb-4';
+
+          const progressLoader = document.createElement('div');
+          progressLoader.className = 'bg-white h-full rounded-full absolute left-0';
+          progressLoader.style.width = '0%';
+
+          const progressText = document.createElement('span');
+          progressText.className = 'text-white text-sm font-medium';
+          progressText.textContent = 'Loading 0%';
+
+          progressLoaderContainer.appendChild(progressLoader);
+          loaderWrapper.appendChild(progressLoaderContainer);
+          loaderWrapper.appendChild(progressText);
+          blackCanvas.appendChild(loaderWrapper);
+
+          container.appendChild(blackCanvas);
+
+          // Video element
+          videoElement.className = 'w-full max-w-[600px] h-auto hidden rounded-lg shadow-lg';
+          blackCanvas.appendChild(videoElement);
+
+          root.appendChild(container);
+
+          let isAudioSelected = false;
+          let isVideoSelected = false;
+
+          audioInputWrapper.querySelector('input')?.addEventListener('change', () => {
+               if (audioInputWrapper.querySelector('input')?.files?.length) {
+                    isAudioSelected = true;
+                    audioElement.src = URL.createObjectURL(audioInputWrapper.querySelector('input')?.files[0]);
+                    checkFileStatus();
+               }
+          });
+
+          videoInputWrapper.querySelector('input')?.addEventListener('change', () => {
+               if (videoInputWrapper.querySelector('input')?.files?.length) {
+                    isVideoSelected = true;
+                    videoElement.src = URL.createObjectURL(videoInputWrapper.querySelector('input')?.files[0]);
+                    checkFileStatus();
+               }
+          });
+
+          function checkFileStatus() {
+               if (isAudioSelected && isVideoSelected) {
+                    startProgressLoader();
+               }
+          }
+
+          function startProgressLoader() {
+               blackCanvas.classList.remove('hidden');
+               let progress = 0;
+               title.classList.add('hidden')
+               // Hide input and progress loader while the video is loading
+               inputContainer.classList.add('hidden');
+               videoElement.classList.remove('hidden');
+
+               const interval = setInterval(() => {
+                    if (progress >= 100) {
+                         clearInterval(interval);
+                         progressText.textContent = 'Complete';
+                         progressLoader.style.width = '100%';
+                         // After loading is complete, make the video full-screen
+                         videoElement.classList.add('w-full', 'h-full'); // Make video cover window
+                         videoElement.play();
+                         audioElement.play();
+
+                         // Hide the progress loader and canvas once the video starts
+                         blackCanvas.classList.add('hidden');
+                    } else {
+                         progress++;
+                         progressLoader.style.width = `${progress}%`;
+                         progressText.textContent = `Loading ${progress}%`;
+                    }
+               }, 50);
+          }
+
+
+          videoElement.addEventListener('timeupdate', () => {
+               if (Math.abs(videoElement.currentTime - audioElement.currentTime) > 0.1) {
+                    audioElement.currentTime = videoElement.currentTime;
+               }
+          });
+
+          document.addEventListener('keydown', (e) => {
+               // Spacebar - Play or Pause
+               if (e.code === 'Space') {
+                    e.preventDefault();
+                    if (videoElement.paused) {
+                         videoElement.play();
+                         audioElement.play();
+                    } else {
+                         videoElement.pause();
+                         audioElement.pause();
+                    }
+               }
+
+               // F - Fullscreen
+               if (e.code === 'KeyF') {
+                    if (!document.fullscreenElement) {
+                         videoElement.requestFullscreen();
+                    } else {
+                         document.exitFullscreen();
+                    }
+               }
+
+               // Arrow Left/Right - Forward or Backward
+               if (e.code === 'ArrowLeft') {
+                    videoElement.currentTime -= 10;
+                    audioElement.currentTime = videoElement.currentTime;
+               } else if (e.code === 'ArrowRight') {
+                    videoElement.currentTime += 10;
+                    audioElement.currentTime = videoElement.currentTime;
+               }
+
+               // Arrow Up/Down - Adjust volume
+               if (e.code === 'ArrowUp') {
+                    videoElement.volume = Math.min(videoElement.volume + 0.1, 1);
+               } else if (e.code === 'ArrowDown') {
+                    videoElement.volume = Math.max(videoElement.volume - 0.1, 0);
+               }
+          });
+
+          function createFileInputWrapper(acceptType: string, iconClass: string, type: string) {
+               const wrapper = document.createElement('div');
+               wrapper.className = 'flex flex-col items-center space-y-4';
+
+               const icon = document.createElement('i');
+               icon.className = `bx ${iconClass} text-4xl text-gray-300`;
+               wrapper.appendChild(icon);
+
+               const input = document.createElement('input');
+               input.type = 'file';
+               input.accept = acceptType;
+               input.className = 'file-input bg-gray-800 text-white p-4 rounded-xl hover:bg-gray-700 focus:ring-2 focus:ring-blue-500 transition-all ease-in-out duration-300';
+               wrapper.appendChild(input);
+
+               const label = document.createElement('span');
+               label.className = 'text-sm text-gray-300';
+               label.textContent = `Upload ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+               wrapper.appendChild(label);
+
+               return wrapper;
+          }
+     } else {
+          console.error('Element with id "root" not found.');
+     }
+});
+
+
+
+
+import '../output.css';
+import 'boxicons/css/boxicons.min.css';
+
+document.addEventListener('DOMContentLoaded', () => {
+    const root = document.getElementById('root');
+
+    if (root) {
+        const container = document.createElement('div');
+        container.className = 'flex flex-col justify-center items-center h-screen w-full bg-gray-900 text-white';
+
+        // Title
+        const title = document.createElement('h1');
+        title.className = 'text-3xl font-semibold mb-8 tracking-wide';
+        title.textContent = 'Upload Audio and Video Files';
+        container.appendChild(title);
+
+        // Input container with audio and video input
+        const inputContainer = document.createElement('div');
+        inputContainer.className = 'flex gap-6 items-center justify-center flex-wrap mb-8';
+
+        // Audio input
+        const audioInputWrapper = createFileInputWrapper('audio/*', 'bx-music', 'audio');
+        // Video input
+        const videoInputWrapper = createFileInputWrapper('video/*', 'bx-video', 'video');
+
+        inputContainer.appendChild(audioInputWrapper);
+        inputContainer.appendChild(videoInputWrapper);
+        container.appendChild(inputContainer);
+
+        // Progress loader and black canvas overlay
+        const blackCanvas = document.createElement('div');
+        blackCanvas.className = 'fixed inset-0 bg-black opacity-100 hidden flex justify-center items-center';
+
+        const loaderWrapper = document.createElement('div');
+        loaderWrapper.className = 'flex flex-col items-center text-center space-y-4';
+
+        const progressLoaderContainer = document.createElement('div');
+        progressLoaderContainer.className = 'w-3/4 max-w-[400px] h-1 bg-gray-700 rounded-full relative mb-4';
+
+        const progressLoader = document.createElement('div');
+        progressLoader.className = 'bg-white h-full rounded-full absolute left-0';
+        progressLoader.style.width = '0%';
+
+        const progressText = document.createElement('span');
+        progressText.className = 'text-white text-sm font-medium';
+        progressText.textContent = 'Loading 0%';
+
+        progressLoaderContainer.appendChild(progressLoader);
+        loaderWrapper.appendChild(progressLoaderContainer);
+        loaderWrapper.appendChild(progressText);
+        blackCanvas.appendChild(loaderWrapper);
+
+        container.appendChild(blackCanvas);
+
+        // Video element (Make sure it is visible)
+        const videoElement = document.createElement('video');
+        videoElement.className = 'w-full max-w-[800px] h-auto hidden rounded-lg shadow-lg'; // Ensure proper sizing
+        blackCanvas.appendChild(videoElement);
+
+        // Audio element (Make sure it is visible)
+        const audioElement = document.createElement('audio');
+        audioElement.className = 'hidden'; // Keep hidden, will display via controls if necessary
+        blackCanvas.appendChild(audioElement);
+
+        root.appendChild(container);
+
+        let isAudioSelected = false;
+        let isVideoSelected = false;
+
+        audioInputWrapper.querySelector('input')?.addEventListener('change', () => {
+            const file = audioInputWrapper.querySelector('input')?.files?.[0];
+            if (file) {
+                isAudioSelected = true;
+                audioElement.src = URL.createObjectURL(file);
+                checkFileStatus();
+            }
+        });
+
+        videoInputWrapper.querySelector('input')?.addEventListener('change', () => {
+            const file = videoInputWrapper.querySelector('input')?.files?.[0];
+            if (file) {
+                isVideoSelected = true;
+                videoElement.src = URL.createObjectURL(file);
+                checkFileStatus();
+            }
+        });
+
+        function checkFileStatus() {
+            if (isAudioSelected && isVideoSelected) startProgressLoader();
+        }
+
+        function startProgressLoader() {
+            blackCanvas.classList.remove('hidden');
+            let progress = 0;
+            title.classList.add('hidden');
+            inputContainer.classList.add('hidden');
+
+            videoElement.classList.remove('hidden'); // Show the video once loading starts
+            audioElement.classList.remove('hidden'); // Show the audio element once loading starts
+
+            const interval = setInterval(() => {
+                progress >= 100 ? (clearInterval(interval),
+                    progressText.textContent = 'Complete',
+                    progressLoader.style.width = '100%',
+                    videoElement.play(),
+                    audioElement.play(),
+                    blackCanvas.classList.add('hidden')) :
+                    (progress++, progressLoader.style.width = `${progress}%`, progressText.textContent = `Loading ${progress}%`);
+            }, 50);
+        }
+
+        // Synchronize audio and video play times
+        videoElement.addEventListener('timeupdate', () => {
+            Math.abs(videoElement.currentTime - audioElement.currentTime) > 0.1 ?
+                audioElement.currentTime = videoElement.currentTime : null;
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                videoElement.paused ? (videoElement.play(), audioElement.play()) : (videoElement.pause(), audioElement.pause());
+            }
+
+            if (e.code === 'KeyF') {
+                !document.fullscreenElement ? videoElement.requestFullscreen() : document.exitFullscreen();
+            }
+
+            if (e.code === 'ArrowLeft') {
+                videoElement.currentTime -= 10;
+                audioElement.currentTime = videoElement.currentTime;
+            } else if (e.code === 'ArrowRight') {
+                videoElement.currentTime += 10;
+                audioElement.currentTime = videoElement.currentTime;
+            }
+
+            if (e.code === 'ArrowUp') {
+                videoElement.volume = Math.min(videoElement.volume + 0.1, 1);
+            } else if (e.code === 'ArrowDown') {
+                videoElement.volume = Math.max(videoElement.volume - 0.1, 0);
+            }
+        });
+
+        function createFileInputWrapper(acceptType, iconClass, type) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'flex flex-col items-center space-y-4';
+
+            const icon = document.createElement('i');
+            icon.className = `bx ${iconClass} text-4xl text-gray-300`;
+            wrapper.appendChild(icon);
+
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = acceptType;
+            input.className = 'file-input bg-gray-800 text-white p-4 rounded-xl hover:bg-gray-700 focus:ring-2 focus:ring-blue-500 transition-all ease-in-out duration-300';
+            wrapper.appendChild(input);
+
+            const label = document.createElement('span');
+            label.className = 'text-sm text-gray-300';
+            label.textContent = `Upload ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+            wrapper.appendChild(label);
+
+            return wrapper;
+        }
+    } else {
+        console.error('Element with id "root" not found.');
+    }
+});
