@@ -27,23 +27,40 @@ document.addEventListener('DOMContentLoaded', () => {
           const playicon = document.createElement('i');
           playicon.className = 'bx bx-play text-white text-4xl'; // Add the initial 'bx-play' class
 
-          // Append it to the container
-          ControlsContainer.appendChild(playicon);
+          const progressContainer = document.createElement('div');
+          progressContainer.className = 'w-full flex items-center justify-between text-white text-sm font-mono';
 
+          // Create left timestamp (Current Time)
+          const currentTimeDisplay = document.createElement('span');
+          currentTimeDisplay.innerText = '00:00:00:00';
+
+          // Create right timestamp (Remaining Time)
+          const remainingTimeDisplay = document.createElement('span');
+          remainingTimeDisplay.innerText = '00:00:00:00';
+
+          // Create progress bar
           const playerProgress = document.createElement('div');
-          playerProgress.className = 'w-[399px] h-[2px] bg-white relative flex items-center';
+          playerProgress.className = 'w-[1200px] h-[2px] bg-white relative flex items-center';
 
+          // Create handle
           const handleplayer = document.createElement('span');
           handleplayer.className = 'w-[20px] h-[20px] bg-black rounded-full border-2 border-white absolute left-0 transform -translate-x-1/2';
 
-          // Append handle to progress bar
+          // Append elements
+          ControlsContainer.appendChild(playicon)
           playerProgress.appendChild(handleplayer);
+          progressContainer.appendChild(currentTimeDisplay);
+          progressContainer.appendChild(playerProgress);
+          progressContainer.appendChild(remainingTimeDisplay);
+          ControlsContainer.appendChild(progressContainer);
 
-          // Append progress bar to container
-          ControlsContainer.appendChild(playerProgress);
-
-          // Create the play icon element
-
+          const formatTime = (time: number): string => {
+               const hours = Math.floor(time / 3600).toString().padStart(2, '0');
+               const minutes = Math.floor((time % 3600) / 60).toString().padStart(2, '0');
+               const seconds = Math.floor(time % 60).toString().padStart(2, '0');
+               const milliseconds = Math.floor((time % 1) * 1000).toString().padStart(3, '0');
+               return `${hours}:${minutes}:${seconds}:${milliseconds}`;
+          };
           // Add a click event listener to toggle between 'bx-play' and 'bx-pause'
           playicon.addEventListener('click', () => {
                if (playicon.classList.contains('bx-play')) {
@@ -256,9 +273,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
           // Function to update handle position
           const updateHandlePosition = () => {
+               if (!videoElement.duration) return;
+
                const progress = (videoElement.currentTime / videoElement.duration) * 100;
                handleplayer.style.left = `${progress}%`;
+
+               // Update timestamps
+               currentTimeDisplay.innerText = formatTime(videoElement.currentTime);
+               remainingTimeDisplay.innerText = formatTime(videoElement.duration - videoElement.currentTime);
           };
+
           // Sync handle with video progress
           videoElement.addEventListener('timeupdate', updateHandlePosition);
 
@@ -273,7 +297,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.removeEventListener('mousemove', onDrag);
                });
           });
-
           const onDrag = (e: MouseEvent) => {
                if (!isDragging) return;
 
@@ -287,6 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                // Update video time accordingly
                videoElement.currentTime = (newLeft / rect.width) * videoElement.duration;
+               updateHandlePosition();
           };
 
           document.addEventListener('keydown', (e) => {
@@ -440,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
                          e.preventDefault();
                          if (forwardTimeout) clearTimeout(forwardTimeout);
                          forwardTimeout = setTimeout(() => {
-                              videoElement.currentTime += 5; // Skip forward
+                              videoElement.currentTime = Math.min(videoElement.currentTime + 5, videoElement.duration);
                               updateHandlePosition();
                          }, 20);
                          break;
@@ -449,7 +473,7 @@ document.addEventListener('DOMContentLoaded', () => {
                          e.preventDefault();
                          if (backwardTimeout) clearTimeout(backwardTimeout);
                          backwardTimeout = setTimeout(() => {
-                              videoElement.currentTime -= 5; // Skip backward
+                              videoElement.currentTime = Math.max(videoElement.currentTime - 5, 0);
                               updateHandlePosition();
                          }, 10);
                          break;
