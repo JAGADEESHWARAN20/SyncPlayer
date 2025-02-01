@@ -28,26 +28,27 @@ document.addEventListener('DOMContentLoaded', () => {
           playicon.className = 'bx bx-play text-white text-4xl'; // Add the initial 'bx-play' class
 
           const progressContainer = document.createElement('div');
-          progressContainer.className = 'w-full flex items-center justify-between text-white text-sm font-mono';
+          progressContainer.className = 'w-full flex items-center justify-start gap-[20px] text-white text-sm font-mono';
 
           // Create left timestamp (Current Time)
           const currentTimeDisplay = document.createElement('span');
           currentTimeDisplay.innerText = '00:00:00:00';
+          currentTimeDisplay.className = 'text-2xl fixed left-[5%] font-[poppins]'
 
           // Create right timestamp (Remaining Time)
           const remainingTimeDisplay = document.createElement('span');
           remainingTimeDisplay.innerText = '00:00:00:00';
-
+          remainingTimeDisplay.className = 'text-2xl fixed right-[10%] font-[poppins]'
           // Create progress bar
           const playerProgress = document.createElement('div');
-          playerProgress.className = 'w-[1200px] h-[2px] bg-white relative flex items-center';
+          playerProgress.className = 'w-[1150px] min-w-[600px] max-w-[2160px] h-[2px] bg-white fixed left-[15%] relative flex items-center';
 
           // Create handle
           const handleplayer = document.createElement('span');
           handleplayer.className = 'w-[20px] h-[20px] bg-black rounded-full border-2 border-white absolute left-0 transform -translate-x-1/2';
 
           // Append elements
-          ControlsContainer.appendChild(playicon)
+          ControlsContainer.appendChild(playicon);
           playerProgress.appendChild(handleplayer);
           progressContainer.appendChild(currentTimeDisplay);
           progressContainer.appendChild(playerProgress);
@@ -76,9 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
                }
           });
 
-          container.appendChild(ControlsContainer);
+          document.body.appendChild(ControlsContainer);
+          document.body.className = 'overflow-hidden'
 
-          // Variable to track if the mouse is inside the controls
           let isMouseOverControls = false;
 
           // Add mouseenter and mouseleave events to the controls container
@@ -107,23 +108,184 @@ document.addEventListener('DOMContentLoaded', () => {
                }
           });
 
-          // Create the MenuContainer element
+
           // Create the MenuContainer element
           const MenuContainer = document.createElement('div');
-          MenuContainer.className = 'absolute left-[-1000px] duration-200 z-[9999999] top-[100px] bg-black flex flex-col w-[30dvw] h-[30dvh] transition-all';
+          MenuContainer.className = 'absolute shadow-2xl rounded-lg left-[-1000px] duration-200 z-[9999999] top-[100px] bg-black flex flex-col w-[30dvw] h-[30dvh] transition-all';
           document.body.appendChild(MenuContainer);
+          // Get the Menu Container (Ensure this exists in your HTML)
 
-          // Variable to track if the mouse is inside the menu
+          if (!MenuContainer) throw new Error("Menu container not found");
+
+          // Create Playlist Button
+          const playlistButton = document.createElement("button");
+          playlistButton.id = "playlistButton";
+          playlistButton.className = "w-full p-2 bg-gray-800 rounded mb-4 flex items-center";
+          playlistButton.innerHTML = "<i class='bx bx-list-ul mr-2'></i> Playlist";
+
+          // Playlist Container
+          const playlistContainer = document.createElement("div");
+          playlistContainer.id = "playlistContainer";
+          playlistContainer.className = "p-2 bg-gray-700 rounded hidden flex";
+          playlistContainer.innerHTML = "<h2 class='text-lg font-semibold mb-2'>Now Playing</h2><ul id='playlistItems' class='space-y-2'></ul>";
+
+          // Status Label
+          const statusLabel = document.createElement("p");
+          statusLabel.id = "statusLabel";
+          statusLabel.className = "mt-2 text-center text-gray-400";
+          statusLabel.textContent = "No video loaded";
+
+          // Add Queue Button
+          const addQueueButton = document.createElement("button");
+          addQueueButton.id = "addQueueButton";
+          addQueueButton.className = "p-2 bg-blue-600 text-white rounded ml-2";
+          addQueueButton.textContent = "Add to Queue";
+
+          // Video Input
+          const videoInput = document.createElement("input");
+          videoInput.type = "file";
+          videoInput.accept = "video/*";
+          videoInput.className =
+               "file-input bg-gray-800 z-[999] w-full opacity-0 cursor-pointer absolute h-full right-0 top-0 text-white p-2 rounded";
+
+          // Append elements
+          MenuContainer.appendChild(playlistButton);
+          playlistContainer.appendChild(addQueueButton);
+          MenuContainer.appendChild(playlistContainer);
+          MenuContainer.appendChild(statusLabel);
+          MenuContainer.appendChild(videoInput);
+
+          // Toggle Playlist Visibility
+          playlistButton.addEventListener("click", () => {
+               playlistContainer.classList.toggle("hidden");
+          });
+
+          // Function to Extract Thumbnail
+          function captureThumbnail(videoFile: File, callback: (thumbUrl: string) => void) {
+               const videoElement = document.createElement("video");
+               videoElement.src = URL.createObjectURL(videoFile);
+               videoElement.crossOrigin = "anonymous";
+               videoElement.muted = true;
+               videoElement.currentTime = 2; // Capture at 2 seconds
+
+               videoElement.addEventListener("loadeddata", () => {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = 160;
+                    canvas.height = 90;
+                    const ctx = canvas.getContext("2d");
+
+                    if (!ctx) {
+                         console.error("Canvas context is null.");
+                         return;
+                    }
+
+                    videoElement.play();
+                    setTimeout(() => {
+                         ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                         callback(canvas.toDataURL("image/png"));
+                         videoElement.remove();
+                    }, 500);
+               });
+          }
+
+          // Function to Add Video to Playlist
+          function addToPlaylist(videoFile: File) {
+               const playlistItems = document.getElementById("playlistItems") as HTMLUListElement;
+
+               if (!playlistItems) return;
+
+               const videoName = videoFile.name;
+               captureThumbnail(videoFile, (thumbnailUrl) => {
+                    const listItem = document.createElement("li");
+                    listItem.className = "flex items-center bg-gray-800 p-2 rounded justify-between";
+
+                    // Thumbnail Image
+                    const thumbnail = document.createElement("img");
+                    thumbnail.src = thumbnailUrl;
+                    thumbnail.className = "w-10 h-10 rounded mr-2";
+
+                    // Video Name (Truncated)
+                    const videoTitle = document.createElement("span");
+                    videoTitle.className = "text-white text-sm flex-1 truncate";
+                    videoTitle.textContent = videoName.length > 20 ? `${videoName.slice(0, 10)}...${videoName.slice(-5)}` : videoName;
+                    // Remove Button
+                    const removeButton = document.createElement("button");
+                    removeButton.className = "text-red-500 text-sm";
+                    removeButton.textContent = "Remove";
+                    removeButton.onclick = () => {
+                         listItem.remove();
+
+                         if (playlistItems.children.length === 0) {
+                              statusLabel.textContent = "No video loaded";
+
+                              // Reset input fields safely
+                              videoInput.value = "";
+                              if (videoInput.value = "") { 
+                                   videoElement.src = ""
+                              }// Proper way to reset file input
+                                   if (audioInput) {
+                                        audioInput.value = ""; // Reset only if it exists
+                                   }
+                         }
+                    };
+
+
+                    listItem.appendChild(thumbnail);
+                    listItem.appendChild(videoTitle);
+                    listItem.appendChild(removeButton);
+                    playlistItems.appendChild(listItem);
+
+                    // Update Status Label
+                    statusLabel.textContent = "Playing...";
+               });
+          }
+
+          // Handle Video Input Change
+          videoInput.addEventListener("change", (event) => {
+               const target = event.target as HTMLInputElement;
+               const file = target.files?.[0];
+
+               if (file) {
+                    addToPlaylist(file);
+               }
+          });
+
+
+
+          const blackoverlaycanvas = document.createElement('div');
+          blackoverlaycanvas.className =
+               'w-full h-[100dvh] bg-slate-800 bg-opacity-50 backdrop-blur-sm z-[999] absolute top-0 left-0 opacity-0 transition-opacity duration-500 ease-in-out pointer-events-none';
+
+          // Track if the mouse is over the menu
           let isMouseOverMenu = false;
 
-          // Add mouseenter and mouseleave events to the menu container
-          MenuContainer.addEventListener("mouseenter", () => {
-               isMouseOverMenu = true; // Mouse is inside the menu
+          MenuContainer.addEventListener('mouseenter', () => {
+               isMouseOverMenu = true;
+
+               if (!document.body.contains(blackoverlaycanvas)) {
+                    document.body.appendChild(blackoverlaycanvas);
+               }
+
+               // Ensure it's visible with a fade-in effect
+               setTimeout(() => {
+                    blackoverlaycanvas.classList.add('opacity-100');
+               }, 10);
           });
 
-          MenuContainer.addEventListener("mouseleave", () => {
-               isMouseOverMenu = false; // Mouse left the menu
+          MenuContainer.addEventListener('mouseleave', () => {
+               isMouseOverMenu = false;
+
+               // Start fade-out effect
+               blackoverlaycanvas.classList.remove('opacity-100');
+
+               // Remove the overlay after the fade-out transition ends
+               setTimeout(() => {
+                    if (!isMouseOverMenu && document.body.contains(blackoverlaycanvas)) {
+                         document.body.removeChild(blackoverlaycanvas);
+                    }
+               }, 500); // Matches the duration-500 transition
           });
+
 
           // Listen to mouse movements
           document.addEventListener("mousemove", (event) => {
@@ -173,11 +335,6 @@ document.addEventListener('DOMContentLoaded', () => {
           videoIcon.style.left = '50%';
           videoInputWrapper.appendChild(videoIcon);
 
-          // Video input
-          const videoInput = document.createElement('input');
-          videoInput.type = 'file';
-          videoInput.accept = 'video/*';
-          videoInput.className = 'file-input bg-gray-800 z-[999] w-full opacity-0 cursor-pointer absolute h-full right-0 top-0 text-white p-2 rounded hover:bg-gray-700 focus:ring-2 focus:ring-blue-500';
           videoInputWrapper.appendChild(videoInput);
 
           inputContainer.appendChild(audioInputWrapper);
@@ -214,6 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
           blackCanvas.appendChild(videoElement);
 
           root.appendChild(container);
+          
 
           let isAudioSelected = false;
           let isVideoSelected = false;
@@ -316,43 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
           document.addEventListener('keydown', (e) => {
                switch (e.code) {
                     case 'Space': // Play/Pause toggle on Spacebar
-                         // e.preventDefault();
 
-                         // // Remove any existing icons before creating a new one
-                         // const existingIconWrapper = document.querySelector('.absolute-icon-wrapper');
-                         // if (existingIconWrapper) {
-                         //      existingIconWrapper.remove();
-                         // }
-
-                         // // Create the wrapper and icon element
-                         // const iconWrapper = document.createElement('div');
-                         // iconWrapper.className = 'absolute-icon-wrapper absolute inset-0 w-[100dvw] h-[100dvh] bg-slate-800 bg-opacity-70 backdrop-blur-md  flex justify-center items-center z-10 transition-opacity duration-200'; // Background blur effect
-                         // const boxIcon = document.createElement('i');
-                         // boxIcon.className = 'bx text-6xl scale-[400%] text-white'; // Base icon styles
-
-                         // if (videoElement.paused) {
-                         //      // Play state: show play icon briefly
-                         //      videoElement.play();
-                         //      audioElement.play();
-                         //      boxIcon.classList.add('bx-play'); // Play icon
-                         //      iconWrapper.appendChild(boxIcon);
-                         //      videoElement.parentElement.appendChild(iconWrapper);
-
-                         //      // Fade-out effect
-                         //      setTimeout(() => {
-                         //           iconWrapper.style.opacity = '0';
-                         //           setTimeout(() => {
-                         //                iconWrapper.remove(); // Remove after fade-out
-                         //           }, 1000);
-                         //      }, 20);
-                         // } else {
-                         //      // Pause state: show pause icon persistently
-                         //      videoElement.pause();
-                         //      audioElement.pause();
-                         //      boxIcon.classList.add('bx-pause'); // Pause icon
-                         //      iconWrapper.appendChild(boxIcon);
-                         //      videoElement.parentElement.appendChild(iconWrapper);
-                         // }
                          e.preventDefault();
 
                          // Remove any existing icon wrapper
