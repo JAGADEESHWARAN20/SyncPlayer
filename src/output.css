@@ -1,3 +1,6 @@
+
+
+
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
@@ -534,7 +537,8 @@ embed,
 object {
   display: block;
   /* 1 */
-  vertical-align: middle;
+  vertical-align: middle; /*  ignore */
+  
   /* 2 */
 }
 

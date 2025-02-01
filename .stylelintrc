@@ -1,0 +1,6 @@
+{
+  "rules": {
+    "at-rule-no-unknown": null, /* Disable unknown at-rule warnings */
+    "property-no-unknown": null /* Disable unknown property warnings */
+  }
+}

@@ -220,12 +220,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                               // Reset input fields safely
                               videoInput.value = "";
-                              if (videoInput.value = "") { 
+                              if (videoInput.value = "") {
                                    videoElement.src = ""
                               }// Proper way to reset file input
-                                   if (audioInput) {
-                                        audioInput.value = ""; // Reset only if it exists
-                                   }
+                              if (audioInput) {
+                                   audioInput.value = ""; // Reset only if it exists
+                              }
                          }
                     };
 
@@ -371,7 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
           blackCanvas.appendChild(videoElement);
 
           root.appendChild(container);
-          
+
 
           let isAudioSelected = false;
           let isVideoSelected = false;
