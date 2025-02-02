@@ -107,27 +107,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     ControlsContainer.classList.add('translate-y-[100%]');
                }
           });
-
+          let playlist: { video: File, audio: File | null, videoSrc: string, audioSrc: string | null }[] = [];
+          let currentIndex = -1; // Keeps track of the current playing item in the playlist
 
           // Create the MenuContainer element
           const MenuContainer = document.createElement('div');
-          MenuContainer.className = 'absolute shadow-2xl rounded-lg left-[-1000px] duration-200 z-[9999999] top-[100px] bg-black flex flex-col w-[30dvw] h-[30dvh] transition-all';
+          MenuContainer.className = 'absolute shadow-2xl rounded-lg left-[-1000px] duration-200 z-[9999999] top-[100px] bg-black flex flex-col w-[30dvw] sm:w-[40dvw] h-[30dvh] transition-all';
           document.body.appendChild(MenuContainer);
-          // Get the Menu Container (Ensure this exists in your HTML)
-
-          if (!MenuContainer) throw new Error("Menu container not found");
 
           // Create Playlist Button
-          const playlistButton = document.createElement("button");
+          const playlistButton = document.createElement("div");
           playlistButton.id = "playlistButton";
-          playlistButton.className = "w-full p-2 bg-gray-800 rounded mb-4 flex items-center";
+          playlistButton.className = "w-[20dvw] p-3 z-[10] text-white rounded mb-4 flex items-center";
           playlistButton.innerHTML = "<i class='bx bx-list-ul mr-2'></i> Playlist";
 
-          // Playlist Container
+          // Create the top section
+          const topSection = document.createElement('div');
+          topSection.className = 'w-full h-[10dvh] flex flex-row justify-between items-start';
+
+          // Create Playlist Container
           const playlistContainer = document.createElement("div");
           playlistContainer.id = "playlistContainer";
-          playlistContainer.className = "p-2 bg-gray-700 rounded hidden flex";
-          playlistContainer.innerHTML = "<h2 class='text-lg font-semibold mb-2'>Now Playing</h2><ul id='playlistItems' class='space-y-2'></ul>";
+          playlistContainer.className = "p-2 rounded items-start justify-start flex flex-col";
+          playlistContainer.innerHTML = "<ul id='playlistItems' class='space-y-2'></ul>";
 
           // Status Label
           const statusLabel = document.createElement("p");
@@ -135,30 +137,33 @@ document.addEventListener('DOMContentLoaded', () => {
           statusLabel.className = "mt-2 text-center text-gray-400";
           statusLabel.textContent = "No video loaded";
 
-          // Add Queue Button
+          // Create Add Queue Button
           const addQueueButton = document.createElement("button");
           addQueueButton.id = "addQueueButton";
-          addQueueButton.className = "p-2 bg-blue-600 text-white rounded ml-2";
-          addQueueButton.textContent = "Add to Queue";
+          addQueueButton.className = "w-[10dvw] py-1 m-3 bg-white text-black rounded-full";
+          addQueueButton.textContent = "+ Add";
 
-          // Video Input
+
+          // Create Video Input
           const videoInput = document.createElement("input");
           videoInput.type = "file";
           videoInput.accept = "video/*";
-          videoInput.className =
-               "file-input bg-gray-800 z-[999] w-full opacity-0 cursor-pointer absolute h-full right-0 top-0 text-white p-2 rounded";
+          videoInput.className = "file-input bg-gray-800 z-[999] w-full opacity-0 cursor-pointer absolute h-full right-0 top-0 text-white p-2 rounded";
 
-          // Append elements
-          MenuContainer.appendChild(playlistButton);
-          playlistContainer.appendChild(addQueueButton);
+          // Create Audio Input
+          const audioInput = document.createElement("input");
+          audioInput.type = "file";
+          audioInput.accept = "audio/*";
+          audioInput.className = "file-input bg-gray-800 z-[999] w-full opacity-0 cursor-pointer absolute h-full right-0 top-0 text-white p-2 rounded";
+
+          // Append Elements
+          topSection.appendChild(playlistButton);
+          topSection.appendChild(addQueueButton);
+          addQueueButton.appendChild(videoInput);
+          addQueueButton.appendChild(audioInput);
+          MenuContainer.appendChild(topSection);
           MenuContainer.appendChild(playlistContainer);
           MenuContainer.appendChild(statusLabel);
-          MenuContainer.appendChild(videoInput);
-
-          // Toggle Playlist Visibility
-          playlistButton.addEventListener("click", () => {
-               playlistContainer.classList.toggle("hidden");
-          });
 
           // Function to Extract Thumbnail
           function captureThumbnail(videoFile: File, callback: (thumbUrl: string) => void) {
@@ -187,11 +192,50 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 500);
                });
           }
+          function removeItem(index: number) {
+               // Remove item from the playlist
+               playlist.splice(index, 1);
 
-          // Function to Add Video to Playlist
-          function addToPlaylist(videoFile: File) {
+               // Update the currentIndex based on removal
+               if (playlist.length > 0) {
+                    if (index === 0) {
+                         // If the first item was removed, move to the next
+                         currentIndex = 0;
+                    } else if (index === playlist.length) {
+                         // If the last item was removed, move to the previous
+                         currentIndex = playlist.length - 1;
+                    } else {
+                         // Otherwise stay at the current position, or use some logic for next/prev
+                         currentIndex = index < playlist.length ? index : playlist.length - 1;
+                    }
+
+                    // Update the video and audio element sources
+                    const newItem = playlist[currentIndex];
+                    videoElement.src = newItem.videoSrc;
+                    audioElement.src = newItem.audioSrc || '';
+                    videoElement.play();
+                    audioElement.play();
+               } else {
+                    // Reset the player if no items are left
+                    videoElement.src = '';
+                    audioElement.src = '';
+               }
+               const playlistItems = document.getElementById('playlistitems');
+               // Update the UI (remove the item from the list)
+               const listItem = playlistItems.children[index] as HTMLLIElement;
+               if (listItem) listItem.remove();
+          }
+
+          function addToPlaylist(videoFile: File, audioFile: File | null) {
+               const videoSrc = URL.createObjectURL(videoFile);
+               const audioSrc = audioFile ? URL.createObjectURL(audioFile) : null;
+               playlist.push({
+                    video: videoFile,
+                    audio: audioFile,
+                    videoSrc,
+                    audioSrc
+               });
                const playlistItems = document.getElementById("playlistItems") as HTMLUListElement;
-
                if (!playlistItems) return;
 
                const videoName = videoFile.name;
@@ -208,6 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const videoTitle = document.createElement("span");
                     videoTitle.className = "text-white text-sm flex-1 truncate";
                     videoTitle.textContent = videoName.length > 20 ? `${videoName.slice(0, 10)}...${videoName.slice(-5)}` : videoName;
+
                     // Remove Button
                     const removeButton = document.createElement("button");
                     removeButton.className = "text-red-500 text-sm";
@@ -215,40 +260,109 @@ document.addEventListener('DOMContentLoaded', () => {
                     removeButton.onclick = () => {
                          listItem.remove();
 
+                         if (playlistItems.children.length >= 0) {
+                              // If there are still children, choose the previous item's video
+                              const previousItem = playlistItems.children[playlistItems.children.length] as HTMLLIElement;
+                              const videoElement = document.querySelector("video") as HTMLVideoElement;
+
+                              if (previousItem) {
+                                   // Reset video element source to the previous video's source
+                                   const previousVideoSrc = previousItem.querySelector("video")?.src;
+                                   if (previousVideoSrc) {
+                                        videoElement.src = previousVideoSrc;
+                                   }
+                              }
+                         } else {
+                              // Reset video element source if no playlist items are left
+                              const videoElement = document.querySelector("video") as HTMLVideoElement;
+                              videoElement.src = ""; // Reset video element source
+                         }
+
+                         // Update Status Label
                          if (playlistItems.children.length === 0) {
                               statusLabel.textContent = "No video loaded";
-
-                              // Reset input fields safely
                               videoInput.value = "";
-                              if (videoInput.value = "") {
-                                   videoElement.src = ""
-                              }// Proper way to reset file input
-                              if (audioInput) {
-                                   audioInput.value = ""; // Reset only if it exists
-                              }
+                              if (audioInput) audioInput.value = ""; // Reset only if it exists
                          }
                     };
-
 
                     listItem.appendChild(thumbnail);
                     listItem.appendChild(videoTitle);
                     listItem.appendChild(removeButton);
                     playlistItems.appendChild(listItem);
-
+                    if (playlist.length === 1) {
+                         currentIndex = 0;
+                         videoElement.src = videoSrc;
+                         audioElement.src = audioSrc || '';
+                         videoElement.play();
+                         audioElement.play();
+                    }
                     // Update Status Label
                     statusLabel.textContent = "Playing...";
                });
           }
 
-          // Handle Video Input Change
-          videoInput.addEventListener("change", (event) => {
-               const target = event.target as HTMLInputElement;
-               const file = target.files?.[0];
 
-               if (file) {
-                    addToPlaylist(file);
-               }
+
+          document.querySelector('#addQueueButton').addEventListener('click', () => {
+               const videoInput = document.querySelector('input[type="file"][accept="video/*"]') as HTMLInputElement;
+               const audioInput = document.querySelector('input[type="file"][accept="audio/*"]') as HTMLInputElement;
+
+               videoInput.click();
+
+               videoInput.addEventListener("change", (event) => {
+                    const file = (event.target as HTMLInputElement).files?.[0];
+                    if (file) {
+                         audioInput.click(); // Trigger audio file input automatically
+                         audioInput.addEventListener("change", (event) => {
+                              const audioFile = (event.target as HTMLInputElement).files?.[0] || null;
+                              addToPlaylist(file, audioFile);
+                         });
+                    }
+               });
           });
+
+          if (remainingTimeDisplay.innerText === "00:00:00:00") {
+               // Handle video file input
+               videoInput.addEventListener("change", (event) => {
+                    const target = event.target as HTMLInputElement; // Assert target as HTMLInputElement
+                    const file = target.files?.[0];
+                    if (file) {
+                         addToPlaylist(file, null); // Pass video file and null for audio file
+                    }
+               });
+
+               // Handle audio file input
+               audioInput.addEventListener("change", (event) => {
+                    const target = event.target as HTMLInputElement; // Assert target as HTMLInputElement
+                    const file = target.files?.[0];
+                    if (file) {
+                         console.log("Audio file selected:", file.name);
+                         addToPlaylist(null, file); // Pass null for video file and audio file
+                    }
+               });
+          }
+
+
+          setInterval(() => {
+               const playlistItems = document.getElementById('playlistItems');
+               if (playlistItems.children.length > 0 && remainingTimeDisplay.innerText === "00:00:00:00") {
+                    // Logic to play the next item
+                    const nextItem = playlistItems.children[0]; // Get the next item in the playlist
+                    nextItem.classList.add("playing"); // Mark the item as playing (optional)
+                    statusLabel.textContent = "Next video playing..."; // Update status label
+                    remainingTimeDisplay.innerText = "00:00:00:00"; // Reset the timer after playback
+               }
+          }, 1000);
+
+
+
+
+
+
+
+
+
 
 
 
@@ -317,10 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
           audioInputWrapper.appendChild(audioIcon);
 
           // Audio input
-          const audioInput = document.createElement('input');
-          audioInput.type = 'file';
-          audioInput.accept = 'audio/*';
-          audioInput.className = 'file-input bg-gray-800 z-[999] w-full cursor-pointer opacity-0 absolute h-full left-0 top-0 text-white p-2 rounded hover:bg-gray-700 focus:ring-2 focus:ring-blue-500';
+
           audioInputWrapper.appendChild(audioInput);
 
           // Video input
@@ -366,7 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           container.appendChild(blackCanvas);
 
-          // Video and audio elements
+
           videoElement.className = 'w-full h-full hidden';
           blackCanvas.appendChild(videoElement);
 
@@ -376,21 +487,25 @@ document.addEventListener('DOMContentLoaded', () => {
           let isAudioSelected = false;
           let isVideoSelected = false;
 
-          audioInput.addEventListener('change', () => {
-               if (audioInput.files.length > 0) {
-                    isAudioSelected = true;
-                    audioElement.src = URL.createObjectURL(audioInput.files[0]);
-                    checkFileStatus();
-               }
-          });
+          if (remainingTimeDisplay.innerText = "00:00:00:00") {
+               audioInput.addEventListener('change', () => {
+                    if (audioInput.files.length > 0) {
+                         isAudioSelected = true;
+                         audioElement.src = URL.createObjectURL(audioInput.files[0]);
+                         checkFileStatus();
+                    }
+               });
+               videoInput.addEventListener('change', () => {
+                    if (videoInput.files.length > 0) {
+                         isVideoSelected = true;
+                         videoElement.src = URL.createObjectURL(videoInput.files[0]);
+                         checkFileStatus();
+                    }
+               });
 
-          videoInput.addEventListener('change', () => {
-               if (videoInput.files.length > 0) {
-                    isVideoSelected = true;
-                    videoElement.src = URL.createObjectURL(videoInput.files[0]);
-                    checkFileStatus();
-               }
-          });
+          }
+
+
 
           function checkFileStatus() {
                if (isAudioSelected && isVideoSelected) {
@@ -473,8 +588,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
           document.addEventListener('keydown', (e) => {
                switch (e.code) {
-                    case 'Space': // Play/Pause toggle on Spacebar
-
+                    case 'Space':
+                         // Play/Pause toggle on Spacebar
                          e.preventDefault();
 
                          // Remove any existing icon wrapper
@@ -520,14 +635,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                          break;
 
-                    // case 'ArrowUp': // Increase volume using Arrow Up
-                    //      if (videoElement.volume < 1) {
-                    //           videoElement.volume += 0.05;
-                    //           audioElement.volume += 0.05;
-                    //      }
-                    //      break;
+
                     case 'ArrowUp':
-                    case 'ArrowDown': // Decrease volume
+                    case 'ArrowDown':
+                         // Decrease volume
                          e.preventDefault();
 
                          // Remove any existing volume display before creating a new one
